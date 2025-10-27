@@ -17,16 +17,57 @@ from pyspark.sql.functions import (
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import argparse
 
-def create_spark_session(app_name="LogParserAppProblem2", master="local[*]"):
-    spark = (SparkSession
-             .builder
-             .appName(app_name)
-             .master(master)
-             .getOrCreate())
+def parse_args():
+    parser = argparse.ArgumentParser(description='Problem 2: Log Analysis and Visualization')
+    parser.add_argument('master_url', help='Spark master URL')
+    parser.add_argument('--net-id', required=True, help='Your net ID')
+    return parser.parse_args()
+
+def create_spark_session(master_url):
+    """Create a Spark session optimized for cluster execution."""
+
+    spark = (
+        SparkSession.builder
+        .appName("Problem2_Log_Analysis_and_Visualization")
+
+        # Cluster Configuration
+        .master(master_url)  # Connect to Spark cluster
+
+        # Memory Configuration
+        .config("spark.executor.memory", "4g")
+        .config("spark.driver.memory", "4g")
+        .config("spark.driver.maxResultSize", "2g")
+
+        # Executor Configuration
+        .config("spark.executor.cores", "2")
+        .config("spark.cores.max", "6")  # Use all available cores across cluster
+
+        # S3 Configuration - Use S3A for AWS S3 access
+        .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+        .config("spark.hadoop.fs.s3a.aws.credentials.provider", "com.amazonaws.auth.InstanceProfileCredentialsProvider")
+        .config("spark.jars.packages",
+        "org.apache.hadoop:hadoop-aws:3.4.1,"
+        "com.amazonaws:aws-java-sdk-bundle:1.12.780")
+
+        # Performance settings for cluster execution
+        .config("spark.sql.adaptive.enabled", "true")
+        .config("spark.sql.adaptive.coalescePartitions.enabled", "true")
+
+        # Serialization
+        .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+
+        # Arrow optimization for Pandas conversion
+        .config("spark.sql.execution.arrow.pyspark.enabled", "true")
+
+        .getOrCreate()
+    )
+
+    print("Spark session created successfully for cluster execution")
     return spark
 
-def summary_statistics():
+def summary_statistics(spark, net_id):
     """ Generate summary statistics for applications and clusters from log files.
     Outputs:
     1. CSV file with start and end times for each application
@@ -34,15 +75,11 @@ def summary_statistics():
     3. Text file with overall summary statistics
     """
 
-    # Initialize Spark session
-    print("Creating Spark session...")
-    spark = create_spark_session()
-    print("Spark session created.")
-
     # Read log files
-    file_path = "./data/sample/application_*/*.log"
+    file_path = f"s3a://{net_id}-assignment-spark-cluster-logs/data/application_*/*.log"
     print(f"Reading log files from {file_path}...")
     logs_df = spark.read.text(file_path)
+    print("Log files read into DataFrame.")
 
     # Add a column with the file path
     logs_df = logs_df.withColumn('file_path', input_file_name())
@@ -84,7 +121,7 @@ def summary_statistics():
     timeline_df.show(5)
 
     # save to CSV
-    timeline_df.toPandas().to_csv('./data/output/problem2_timeline.csv', index=False)
+    timeline_df.toPandas().to_csv('problem2_timeline.csv', index=False)
 
 
     ## Part 2.2 -- Aggregated cluster statistics
@@ -99,7 +136,7 @@ def summary_statistics():
     cluster_summary.show(5)
 
     # save to CSV
-    cluster_summary.toPandas().to_csv('./data/output/problem2_cluster_summary.csv', index=False)
+    cluster_summary.toPandas().to_csv('problem2_cluster_summary.csv', index=False)
 
     ## Part 2.3 -- Overall Summary Statistics  
     total_unique_clusters = cluster_summary.count()
@@ -119,7 +156,7 @@ def summary_statistics():
     most_used_clusters.show()
 
     # save to text file
-    with open('./data/output/problem2_stats.txt', 'w') as f:
+    with open('problem2_stats.txt', 'w') as f:
         f.write(f"Total unique clusters: {total_unique_clusters}\n")
         f.write(f"Total applications processed: {total_applications}\n")
         f.write(f"Average applications per cluster: {avg_apps_per_cluster:.2f}\n\n")
@@ -153,35 +190,41 @@ def visualize_data(apps_per_cluster_pd, largest_cluster_apps):
     # Visualization 1: Bar chart of applications per cluster
     plt.figure(figsize=(10, 6))
     ax = sns.barplot(data=apps_per_cluster_pd, x='cluster_id', y='num_applications', 
-        hue='cluster_id', palette='viridis')
+        hue='cluster_id', palette='viridis', legend=False)
     plt.title('Number of Applications per Cluster')
     plt.xlabel('Cluster ID')
     plt.ylabel('Number of Applications')
     for container in ax.containers:
         ax.bar_label(container)
-    plt.savefig('./data/output/problem2_bar_chart.png')
-    plt.show()
+    plt.savefig('problem2_bar_chart.png')
+    plt.close()
 
     # Visualization 2: Density plot of job durations for largest cluster
-    """
-    Shows job duration distribution for the largest cluster (cluster with most applications)
-    Histogram with KDE overlay
-    Log scale on x-axis to handle skewed duration data
-    Sample count (n=X) displayed in title
-    """
     plt.figure(figsize=(10, 6))
     sns.histplot(largest_cluster_apps['job_duration_seconds'], bins=30, kde=True, stat='density', color='skyblue')
     plt.xscale('log')
     plt.title(f'Job Duration Distribution for Largest Cluster (n={len(largest_cluster_apps)})')
     plt.xlabel('Job Duration (seconds, log scale)')
     plt.ylabel('Density')
-    plt.savefig('./data/output/problem2_density_plot.png')
-    plt.show()
+    plt.savefig('problem2_density_plot.png')
+    plt.close()
 
 
 def main():
-    apps_per_cluster_pd, largest_cluster_apps = summary_statistics()
+    # Parse command-line arguments
+    args = parse_args()
+
+    # Initialize Spark session
+    spark = create_spark_session(args.master_url)
+
+    # Generate summary statistics
+    apps_per_cluster_pd, largest_cluster_apps = summary_statistics(spark, args.net_id)
+
+    # Generate visualizations
     visualize_data(apps_per_cluster_pd, largest_cluster_apps)
+
+    # Stop Spark session
+    spark.stop()
 
 if __name__ == "__main__":
     main() 
