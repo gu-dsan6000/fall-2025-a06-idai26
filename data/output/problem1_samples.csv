@@ -1,0 +1,11 @@
+message,log_level
+17/03/29 10:11:15 INFO executor.Executor: Running task 2.0 in stage 4.0 (TID 62),INFO
+"17/03/29 10:11:17 INFO storage.MemoryStore: Block broadcast_6_piece0 stored as bytes in memory (estimated size 1677.0 B, free 45.3 MB)",INFO
+17/03/29 10:04:44 INFO ExecutorRunnable: Starting Executor Container,INFO
+17/03/29 10:11:18 INFO storage.BlockManager: Found block rdd_9_11 locally,INFO
+17/03/29 10:05:01 INFO storage.ShuffleBlockFetcherIterator: Getting 20 non-empty blocks out of 20 blocks,INFO
+17/03/29 10:03:22 INFO executor.Executor: Finished task 16.0 in stage 3.0 (TID 57). 1129 bytes result sent to driver,INFO
+17/03/29 10:02:19 INFO broadcast.TorrentBroadcast: Started reading broadcast variable 6,INFO
+17/03/29 10:11:19 INFO broadcast.TorrentBroadcast: Started reading broadcast variable 9,INFO
+17/03/29 10:04:57 INFO executor.CoarseGrainedExecutorBackend: Got assigned task 72,INFO
+17/03/29 10:04:09 INFO spark.MapOutputTrackerWorker: Doing the fetch; tracker endpoint = NettyRpcEndpointRef(spark://MapOutputTracker@10.10.34.11:48782),INFO

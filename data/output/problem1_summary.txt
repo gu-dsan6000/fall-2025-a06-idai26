@@ -1,0 +1,8 @@
+Total log entries processed: 1911
+Total log entries with log levels: 1601
+
+Log Level Summary:
+log_level  count  percentage
+     INFO   1573   98.251093
+    ERROR     14    0.874453
+     WARN     14    0.874453
