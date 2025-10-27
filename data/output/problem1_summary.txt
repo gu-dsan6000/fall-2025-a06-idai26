@@ -1,5 +1,6 @@
-Total log entries processed: 1911
-Total log entries with log levels: 1601
+Total log entries processed: 1,911
+Total log entries with log levels: 1,601
+Unique log levels: 3
 
 Log Level Summary:
 log_level  count  percentage

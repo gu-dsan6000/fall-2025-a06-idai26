@@ -1,0 +1,11 @@
+message,log_level
+17/03/29 10:11:17 INFO executor.Executor: Finished task 6.0 in stage 5.0 (TID 92). 1129 bytes result sent to driver,INFO
+17/03/29 10:04:46 INFO util.Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 58781.,INFO
+"17/03/29 10:04:58 INFO storage.MemoryStore: Block rdd_9_10 stored as values in memory (estimated size 4.1 MB, free 45.3 MB)",INFO
+17/03/29 10:03:21 INFO executor.Executor: Finished task 12.0 in stage 2.0 (TID 34). 2271 bytes result sent to driver,INFO
+"17/03/29 10:05:18 INFO ApplicationMaster: Final app status: SUCCEEDED, exitCode: 0",INFO
+17/03/29 10:03:12 INFO executor.CoarseGrainedExecutorBackend: Driver commanded a shutdown,INFO
+17/03/29 10:11:10 INFO rdd.HadoopRDD: Input split: hdfs://10.10.34.11:9000/pjhe/input/orderHDFSseq.txt:16366163+1487833,INFO
+17/03/29 10:09:40 INFO broadcast.TorrentBroadcast: Reading broadcast variable 6 took 107 ms,INFO
+"17/03/29 10:11:19 INFO spark.MapOutputTrackerWorker: Don't have map outputs for shuffle 2, fetching them",INFO
+17/03/29 10:04:44 INFO ExecutorRunnable: Preparing Local resources,INFO
