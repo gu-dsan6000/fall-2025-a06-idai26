@@ -47,8 +47,7 @@ def create_spark_session(master_url):
         .config("spark.hadoop.fs.s3a.aws.credentials.provider", "com.amazonaws.auth.InstanceProfileCredentialsProvider")
         .config("spark.jars.packages",
         "org.apache.hadoop:hadoop-aws:3.4.1,"
-        "software.amazon.awssdk:bundle:2.25.11,"
-        "software.amazon.awssdk:s3:2.25.11")
+        "com.amazonaws:aws-java-sdk-bundle:1.12.780")
 
         # Performance settings for cluster execution
         .config("spark.sql.adaptive.enabled", "true")
@@ -79,7 +78,7 @@ def main():
     print("Spark session created.")
 
     # Read log files
-    file_path = f"s3://{net_id}-assignment-spark-cluster-logs/data/application_*/*.log"
+    file_path = f"s3a://{net_id}-assignment-spark-cluster-logs/data/application_*/*.log"
     print(f"Reading log files from {file_path}...")
     logs_df = spark.read.text(file_path)
     print("Log files read into DataFrame.")
@@ -110,7 +109,7 @@ def main():
     # Display and save log level counts
     print("Log Level Counts:")
     log_level_counts.show()
-    log_level_counts.toPandas().to_csv('./data/output/problem1_counts.csv', index=False)
+    log_level_counts.toPandas().to_csv('problem1_counts.csv', index=False)
 
     # Summary 2: Sample of logs
     log_samples = (logs_parsed_filtered
@@ -122,7 +121,7 @@ def main():
     # Display and save log samples
     print("Log Samples:")
     log_samples.show()
-    log_samples.toPandas().to_csv('./data/output/problem1_sample.csv', index=False)
+    log_samples.toPandas().to_csv('problem1_sample.csv', index=False)
 
 
     # Summary 3: Summary Statistics
@@ -152,7 +151,7 @@ def main():
     log_level_summary.show()
 
     # save log level summary to txt
-    with open('./data/output/problem1_summary.txt', 'w') as f:
+    with open('problem1_summary.txt', 'w') as f:
         f.write(f"Total log entries processed: {total_logs:,}\n")
         f.write(f"Total log entries with log levels: {total_with_levels:,}\n")
         f.write(f"Unique log levels: {unique_log_levels:,}\n\n")

@@ -1,11 +1,11 @@
 message,log_level
-17/03/29 10:11:17 INFO executor.Executor: Finished task 6.0 in stage 5.0 (TID 92). 1129 bytes result sent to driver,INFO
-17/03/29 10:04:46 INFO util.Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 58781.,INFO
-"17/03/29 10:04:58 INFO storage.MemoryStore: Block rdd_9_10 stored as values in memory (estimated size 4.1 MB, free 45.3 MB)",INFO
-17/03/29 10:03:21 INFO executor.Executor: Finished task 12.0 in stage 2.0 (TID 34). 2271 bytes result sent to driver,INFO
-"17/03/29 10:05:18 INFO ApplicationMaster: Final app status: SUCCEEDED, exitCode: 0",INFO
-17/03/29 10:03:12 INFO executor.CoarseGrainedExecutorBackend: Driver commanded a shutdown,INFO
-17/03/29 10:11:10 INFO rdd.HadoopRDD: Input split: hdfs://10.10.34.11:9000/pjhe/input/orderHDFSseq.txt:16366163+1487833,INFO
-17/03/29 10:09:40 INFO broadcast.TorrentBroadcast: Reading broadcast variable 6 took 107 ms,INFO
-"17/03/29 10:11:19 INFO spark.MapOutputTrackerWorker: Don't have map outputs for shuffle 2, fetching them",INFO
-17/03/29 10:04:44 INFO ExecutorRunnable: Preparing Local resources,INFO
+17/06/08 21:34:59 INFO storage.BlockManager: Removing RDD 19425,INFO
+17/06/08 10:04:11 INFO executor.CoarseGrainedExecutorBackend: Got assigned task 25410,INFO
+17/06/09 11:12:25 INFO executor.Executor: Running task 37.0 in stage 956.0 (TID 38719),INFO
+"17/06/08 10:16:39 INFO python.PythonRunner: Times: total = 37, boot = 16, init = 21, finish = 0",INFO
+"17/06/08 11:01:05 INFO python.PythonRunner: Times: total = 39, boot = -48, init = 86, finish = 1",INFO
+"17/06/06 22:15:57 INFO python.PythonRunner: Times: total = 42, boot = 25, init = 17, finish = 0",INFO
+17/06/09 22:02:51 INFO executor.Executor: Finished task 14.0 in stage 5709.0 (TID 229655). 2667 bytes result sent to driver,INFO
+17/06/08 10:01:22 INFO storage.BlockManager: Found block rdd_2_25 locally,INFO
+"17/06/08 10:37:08 INFO python.PythonRunner: Times: total = 38, boot = 17, init = 21, finish = 0",INFO
+"17/06/09 21:37:26 INFO python.PythonRunner: Times: total = 40, boot = -40, init = 80, finish = 0",INFO
