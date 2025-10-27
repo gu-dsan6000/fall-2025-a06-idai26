@@ -14,24 +14,72 @@ from pyspark.sql.functions import (
     regexp_extract
 )
 import pandas as pd
+import argparse
 
-def create_spark_session(app_name="LogParserApp", master="local[*]"):
-    spark = (SparkSession
-             .builder
-             .appName(app_name)
-             .master(master)
-             .getOrCreate())
+def parse_args():
+    parser = argparse.ArgumentParser(description='Problem 1: Log Level Distribution')
+    parser.add_argument('master_url', help='Spark master URL')
+    parser.add_argument('--net-id', required=True, help='Your net ID')
+    return parser.parse_args()
+
+
+def create_spark_session(master_url):
+    """Create a Spark session optimized for cluster execution."""
+
+    spark = (
+        SparkSession.builder
+        .appName("Problem1_DailySummaries_Cluster")
+
+        # Cluster Configuration
+        .master(master_url)  # Connect to Spark cluster
+
+        # Memory Configuration
+        .config("spark.executor.memory", "4g")
+        .config("spark.driver.memory", "4g")
+        .config("spark.driver.maxResultSize", "2g")
+
+        # Executor Configuration
+        .config("spark.executor.cores", "2")
+        .config("spark.cores.max", "6")  # Use all available cores across cluster
+
+        # S3 Configuration - Use S3A for AWS S3 access
+        .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+        .config("spark.hadoop.fs.s3a.aws.credentials.provider", "com.amazonaws.auth.InstanceProfileCredentialsProvider")
+        .config("spark.jars.packages",
+        "org.apache.hadoop:hadoop-aws:3.4.1,"
+        "software.amazon.awssdk:bundle:2.25.11,"
+        "software.amazon.awssdk:s3:2.25.11")
+
+        # Performance settings for cluster execution
+        .config("spark.sql.adaptive.enabled", "true")
+        .config("spark.sql.adaptive.coalescePartitions.enabled", "true")
+
+        # Serialization
+        .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+
+        # Arrow optimization for Pandas conversion
+        .config("spark.sql.execution.arrow.pyspark.enabled", "true")
+
+        .getOrCreate()
+    )
+
+    print("Spark session created successfully for cluster execution")
     return spark
 
 def main():
 
+    # Parse command-line arguments
+    args = parse_args()
+    net_id = args.net_id
+    master_url = args.master_url
+
     # Initialize Spark session
     print("Creating Spark session...")
-    spark = create_spark_session()
+    spark = create_spark_session(master_url)
     print("Spark session created.")
 
     # Read log files
-    file_path = "./data/sample/application_*/*.log"
+    file_path = f"s3://{net_id}-assignment-spark-cluster-logs/data/application_*/*.log"
     print(f"Reading log files from {file_path}...")
     logs_df = spark.read.text(file_path)
     print("Log files read into DataFrame.")
